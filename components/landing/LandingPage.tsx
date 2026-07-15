@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowSquareOut, GithubLogo } from "@phosphor-icons/react";
@@ -9,15 +9,15 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { transitStats } from "@/lib/stats";
 
 function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = () => setReduced(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  return reduced;
+  return useSyncExternalStore(
+    (callback) => {
+      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+      mq.addEventListener("change", callback);
+      return () => mq.removeEventListener("change", callback);
+    },
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false
+  );
 }
 
 function CountUp({ value, duration = 1400 }: { value: number; duration?: number }) {
@@ -27,10 +27,7 @@ function CountUp({ value, duration = 1400 }: { value: number; duration?: number 
   const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (reduced) {
-      setDisplay(value);
-      return;
-    }
+    if (reduced) return;
     const el = ref.current;
     if (!el) return;
 
@@ -53,9 +50,10 @@ function CountUp({ value, duration = 1400 }: { value: number; duration?: number 
     return () => observer.disconnect();
   }, [value, duration, reduced]);
 
+  const shown = reduced ? value : display;
   return (
     <span ref={ref} className="tabular-nums">
-      {display.toLocaleString("ro-RO")}
+      {shown.toLocaleString("ro-RO")}
     </span>
   );
 }

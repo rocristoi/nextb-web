@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { MagnifyingGlass, CaretRight, Warning } from "@phosphor-icons/react";
+import { MagnifyingGlass, CaretRight } from "@phosphor-icons/react";
 import { useRoutes, useAlerts } from "@/lib/hooks/useApi";
 import { useStore } from "@/lib/store";
 import type { RouteInfo } from "@/lib/types";

@@ -26,7 +26,6 @@ export function estimateMinEtaMinutes(
 ): number {
   if (distanceMeters <= 100) return 0;
 
-  const spacing = serverConfig.stopSpacingMeters();
   const stopsAway = estimateStopsAway(distanceMeters);
   const minPerStop = serverConfig.minMinutesPerStop();
 

@@ -26,7 +26,8 @@ import {
 } from "./resolve-vehicle";
 import { getVehicleType, resolveVehicleWithAc } from "./vehicles";
 import { getCityTourForLine, UNKNOWN_VEHICLE_IMAGE } from "@/lib/vehicles/imageMap";
-import type { RouteShapeResponse, StationResponse } from "@/lib/types";
+import type { RouteShapeResponse, StationResponse, AcConfidence, ComfortTier, RouteVehicle } from "@/lib/types";
+import type { MobiDatasetEntry, MobiStationArrivals, MobiVehicleFeedEntry } from "./mobi-types";
 import {
   assignFollowerEtas,
   sanitizeLeadEta,
@@ -47,12 +48,28 @@ const isTimestampRecent = (timestamp: number) => {
   return diffInSeconds <= serverConfig.lineCheckCooldown();
 };
 
+type StationVehicleEntry = {
+  id: number | null;
+  distance: number;
+  position: [number, number];
+  plate: string;
+  on_board: number | null;
+  ac?: boolean;
+  acConfidence?: AcConfidence;
+  type?: string;
+  image?: string | null;
+  comfortScore?: number;
+  comfortTier?: ComfortTier;
+  stopsAway?: number | null;
+  time?: number | string;
+};
+
 function filterVehiclesForLine(
-  allVehicles: any[],
+  allVehicles: MobiVehicleFeedEntry[],
   line: { id: unknown; direction: unknown }
 ) {
   return allVehicles.filter(
-    (veh: any) =>
+    (veh) =>
       veh?.vehicle?.trip &&
       veh?.vehicle?.vehicle &&
       veh.vehicle.trip.routeId == line.id &&
@@ -62,14 +79,18 @@ function filterVehiclesForLine(
 }
 
 async function refreshVehiclesIfStale(
-  vehicles: any[],
+  vehicles: MobiVehicleFeedEntry[],
   lines: { id: unknown; direction: unknown }[]
-): Promise<any[]> {
+): Promise<MobiVehicleFeedEntry[]> {
   const hasStaleLineVehicles = lines.some((line) => {
     const filtered = filterVehiclesForLine(vehicles, line);
     return (
       filtered.length > 0 &&
-      !filtered.every((veh) => isTimestampRecent(veh.vehicle.timestamp))
+      !filtered.every(
+        (veh) =>
+          veh.vehicle.timestamp != null &&
+          isTimestampRecent(veh.vehicle.timestamp)
+      )
     );
   });
 
@@ -84,7 +105,7 @@ async function refreshVehiclesIfStale(
   }
 }
 
-async function enrichVehicle(veh: any, lineName: string) {
+async function enrichVehicle(veh: StationVehicleEntry, lineName: string) {
   if (veh.id == 0 || veh.id == null) {
     const cityTour = getCityTourForLine(lineName);
     const type = cityTour?.type ?? getVehicleType(parseInt(lineName));
@@ -128,10 +149,10 @@ function assignVehicleArrivalTimes(
 export async function getStationArrivals(
   stationID: string
 ): Promise<StationResponse> {
-  let allVehicles: any[];
-  let stationInfo: any;
-  let datasetByPlate: Map<string, any>;
-  let datasetByInventory: Map<number, any>;
+  let allVehicles: MobiVehicleFeedEntry[];
+  let stationInfo: MobiStationArrivals;
+  let datasetByPlate: Map<string, MobiDatasetEntry>;
+  let datasetByInventory: Map<number, MobiDatasetEntry>;
 
   try {
     const datasetIndexes = await buildDatasetIndexes();
@@ -156,14 +177,14 @@ export async function getStationArrivals(
     lines: {},
   };
 
-  for (const line of lines.sort((a: any, b: any) =>
+  for (const line of lines.sort((a, b) =>
     a.name.localeCompare(b.name)
   )) {
     let nextArrivalTime: number | null = null;
 
     if (Array.isArray(nextArrivals?.lines)) {
       const arrivalLine = nextArrivals.lines.find(
-        (l: any) => String(l.id) === String(line.id)
+        (l) => String(l.id) === String(line.id)
       );
       if (arrivalLine?.arrivingTime !== undefined) {
         nextArrivalTime = arrivalLine.arrivingTime;
@@ -181,7 +202,7 @@ export async function getStationArrivals(
       continue;
     }
 
-    const distAndIdPromises = filteredVehicles.map(async (veh: any) => {
+    const distAndIdPromises = filteredVehicles.map(async (veh) => {
       const vehLat = veh.vehicle.position.latitude;
       const vehLong = veh.vehicle.position.longitude;
       const plate = veh.vehicle.vehicle.licensePlate;
@@ -217,7 +238,9 @@ export async function getStationArrivals(
       return null;
     });
 
-    let orderedIDs = (await Promise.all(distAndIdPromises)).filter(Boolean) as any[];
+    let orderedIDs = (await Promise.all(distAndIdPromises)).filter(
+      (entry): entry is StationVehicleEntry => entry != null
+    );
     orderedIDs = orderedIDs.sort((a, b) => a.distance - b.distance);
 
     for (let i = 0; i < orderedIDs.length; i++) {
@@ -229,7 +252,7 @@ export async function getStationArrivals(
     }
 
     assignVehicleArrivalTimes(orderedIDs, nextArrivalTime, lineMode);
-    finalObject.lines[line.name] = orderedIDs;
+    finalObject.lines[line.name] = orderedIDs as StationResponse["lines"][string];
   }
 
   return finalObject;
@@ -256,7 +279,10 @@ export async function getRouteShapeData(
     { id: shapeID, direction: 1 },
   ]);
 
-  const result = { tour: [] as any[], retour: [] as any[] };
+  const result: {
+    tour: RouteShapeResponse["tour"]["vehicles"];
+    retour: RouteShapeResponse["retour"]["vehicles"];
+  } = { tour: [], retour: [] };
 
   for (const v of busData) {
     if (!v.vehicle?.trip || !v.vehicle?.vehicle) continue;
@@ -306,8 +332,7 @@ export async function getRouteShapeData(
       shapeProgressMeters > 0 ? cumulative - shapeProgressMeters : distToEnd
     );
 
-    const vehicleEntry = {
-      ...v,
+    const vehicleEntry: RouteVehicle = {
       id,
       type: vehicleResolved.type,
       img: vehicleResolved.image,
@@ -319,6 +344,18 @@ export async function getRouteShapeData(
       on_board,
       licensePlate,
       position: { latitude: vehLat, longitude: vehLon },
+      vehicle: {
+        vehicle: {
+          id: v.vehicle.vehicle.id ?? String(v.id ?? ""),
+          th_id: v.vehicle.vehicle.th_id,
+          licensePlate: v.vehicle.vehicle.licensePlate,
+        },
+        position: v.vehicle.position,
+        trip: {
+          routeId: String(v.vehicle.trip.routeId),
+          directionId: v.vehicle.trip.directionId,
+        },
+      },
     };
 
     if (v.vehicle.trip.directionId === 0) {
@@ -328,7 +365,7 @@ export async function getRouteShapeData(
     }
   }
 
-  const sortVehicles = (list: any[]) =>
+  const sortVehicles = (list: RouteShapeResponse["tour"]["vehicles"]) =>
     sortByComfortThenEta(list.map((v) => ({ ...v, time: undefined })));
 
   return {

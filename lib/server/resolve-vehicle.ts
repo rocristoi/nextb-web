@@ -1,13 +1,12 @@
 import {
-  getFleetInfo,
   getFleetInfoByPlate,
   isTramFleetId,
   resolveFleetInfo,
   type FleetVehicleInfo,
 } from "@/lib/vehicles/fleetInfo";
-import { normalizePlate } from "@/lib/vehicles/plate";
 import { isAstraImperioId } from "@/lib/vehicles/imageMap";
 import { getTramIdByPlate, isTramInventoryId } from "./vehicles";
+import type { MobiDatasetEntry, MobiVehicleFeedEntry } from "./mobi-types";
 
 export type VehicleMode = "tram" | "bus" | "trolleybus" | "unknown";
 
@@ -24,7 +23,10 @@ function validThId(value: unknown): number | null {
   return id;
 }
 
-function extractPlate(busEntry: any, datasetEntry?: any): string | null {
+function extractPlate(
+  busEntry: MobiVehicleFeedEntry,
+  datasetEntry?: MobiDatasetEntry
+): string | null {
   return (
     busEntry?.vehicle?.vehicle?.licensePlate ??
     datasetEntry?.vehicle?.vehicle?.license_plate ??
@@ -98,8 +100,8 @@ async function resolveIdFromPlate(
 }
 
 export async function resolveVehicle(
-  busEntry: any,
-  datasetEntry?: any,
+  busEntry: MobiVehicleFeedEntry,
+  datasetEntry?: MobiDatasetEntry,
   lineMode?: string
 ): Promise<ResolvedVehicle> {
   let plate = extractPlate(busEntry, datasetEntry);

@@ -7,9 +7,17 @@ export function useAnimatedPolyline(
   coordinates: [number, number][],
   activeKey: string
 ) {
-  const [pointCount, setPointCount] = useState(0);
+  const [pointCount, setPointCount] = useState(() =>
+    coordinates.length < 2 ? coordinates.length : 1
+  );
+  const [prevAnimationKey, setPrevAnimationKey] = useState(activeKey);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  if (prevAnimationKey !== activeKey) {
+    setPrevAnimationKey(activeKey);
+    setPointCount(coordinates.length < 2 ? coordinates.length : 1);
+  }
 
   useEffect(() => {
     const clearTimers = () => {
@@ -22,12 +30,10 @@ export function useAnimatedPolyline(
     clearTimers();
 
     if (coordinates.length < 2) {
-      setPointCount(coordinates.length);
       return clearTimers;
     }
 
     let index = 0;
-    setPointCount(1);
 
     const run = () => {
       index = 0;
@@ -48,7 +54,9 @@ export function useAnimatedPolyline(
     return clearTimers;
   }, [coordinates, activeKey]);
 
-  const animatedCoords = coordinates.slice(0, Math.max(pointCount, 1));
+  const effectivePointCount =
+    coordinates.length < 2 ? coordinates.length : pointCount;
+  const animatedCoords = coordinates.slice(0, Math.max(effectivePointCount, 1));
 
-  return { animatedCoords, pointCount };
+  return { animatedCoords, pointCount: effectivePointCount };
 }

@@ -55,3 +55,5 @@ next-env.d.ts
 
 .vercel
 .env*
+
+test-results/

@@ -1,4 +1,4 @@
-import type { Alert, RouteInfo, RoutesMap } from "@/lib/types";
+import type { Alert, RoutesMap } from "@/lib/types";
 
 export function getAlertsForLine(alerts: Alert[], lineName: string): Alert[] {
   if (!lineName) return [];

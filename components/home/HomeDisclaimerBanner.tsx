@@ -1,30 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 import { X } from "@phosphor-icons/react";
 import { ro } from "@/lib/i18n";
 
 const BANNER_KEY = "nextb-banner-dismissed";
 
+function subscribe(callback: () => void) {
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
+function getBannerVisible() {
+  try {
+    return localStorage.getItem(BANNER_KEY) !== "1";
+  } catch {
+    return true;
+  }
+}
+
 export function HomeDisclaimerBanner() {
-  const [visible, setVisible] = useState(false);
+  const storedVisible = useSyncExternalStore(subscribe, getBannerVisible, () => true);
+  const [dismissedLocally, setDismissedLocally] = useState(false);
+  const visible = storedVisible && !dismissedLocally;
 
-  useEffect(() => {
-    try {
-      setVisible(localStorage.getItem(BANNER_KEY) !== "1");
-    } catch {
-      setVisible(true);
-    }
-  }, []);
-
-  const dismiss = () => {
+  const dismiss = useCallback(() => {
     try {
       localStorage.setItem(BANNER_KEY, "1");
     } catch {
       /* ignore */
     }
-    setVisible(false);
-  };
+    setDismissedLocally(true);
+  }, []);
 
   if (!visible) return null;
 

@@ -4,12 +4,6 @@ import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react";
 import { NexTBLogo } from "@/components/brand/NexTBLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { ro } from "@/lib/i18n";
-
-const navLinks = [
-  { href: "/app/map", label: ro.nav.map },
-  { href: "/app/lines", label: ro.nav.lines },
-];
 
 export function MarketingHeader() {
   return (

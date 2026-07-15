@@ -29,7 +29,7 @@ export function StationPanel({
 
   const sortedLines = useMemo(
     () => (data?.lines ? sortStationLines(data.lines) : []),
-    [data?.lines]
+    [data]
   );
 
   const toggleFavorite = () => {

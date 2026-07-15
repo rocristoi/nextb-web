@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { Snowflake, X } from "@phosphor-icons/react";
@@ -39,11 +39,11 @@ export function VehicleFleetModal({
   fleetInfo,
   onClose,
 }: VehicleFleetModalProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   const resolvedFleet = fleetInfo ?? resolveFleetInfo(livePlate, inventoryId);
   const fallback = inventoryId

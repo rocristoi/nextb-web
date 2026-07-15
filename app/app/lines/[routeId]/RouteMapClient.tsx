@@ -56,7 +56,6 @@ export default function RouteMapClient() {
   const params = useParams();
   const routeId = params.routeId as string;
   const mapRef = useRef<MapRef>(null);
-  const highlightAppliedRef = useRef(false);
   const highlightFlownRef = useRef<string | null>(null);
   const theme = useStore((s) => s.theme);
   const routeName = searchParams.get("name") ?? "";
@@ -65,12 +64,17 @@ export default function RouteMapClient() {
   const highlightPlate = searchParams.get("plate");
   const [direction, setDirection] = useState<"tour" | "retour">("tour");
   const [selectedVehicle, setSelectedVehicle] = useState<RouteVehicle | null>(null);
-  const [alertsOpen, setAlertsOpen] = useState(false);
+  const [alertsManuallyClosed, setAlertsManuallyClosed] = useState(false);
+  const [prevRouteKey, setPrevRouteKey] = useState(`${routeId}-${routeName}`);
+  const [resolvedHighlightKey, setResolvedHighlightKey] = useState<string | null>(null);
   const { data: routeData, isLoading } = useRouteShape(routeId, routeName);
   const { data: alertsData } = useAlerts();
 
   const current = direction === "tour" ? routeData?.tour : routeData?.retour;
-  const shape = current?.shape ?? [];
+  const shape = useMemo(
+    () => current?.shape ?? [],
+    [current?.shape]
+  );
   const vehicles = current?.vehicles ?? [];
 
   const fullCoords = useMemo(() => toLonLat(shape), [shape]);
@@ -100,6 +104,12 @@ export default function RouteMapClient() {
     [animatedCoords, fullCoords]
   );
 
+  const routeKey = `${routeId}-${routeName}`;
+  if (routeKey !== prevRouteKey) {
+    setPrevRouteKey(routeKey);
+    setAlertsManuallyClosed(false);
+  }
+
   const lineAlerts = useMemo(() => {
     if (!alertsData?.notifications || !routeName) return [];
     return alertsData.notifications.filter((a) =>
@@ -107,9 +117,7 @@ export default function RouteMapClient() {
     );
   }, [alertsData, routeName]);
 
-  useEffect(() => {
-    setAlertsOpen(lineAlerts.length > 0);
-  }, [lineAlerts.length, routeName]);
+  const alertsOpen = lineAlerts.length > 0 && !alertsManuallyClosed;
 
   const isHighlighted = useCallback(
     (veh: RouteVehicle) => {
@@ -151,28 +159,27 @@ export default function RouteMapClient() {
     );
   }, [shape, direction, highlightVehicleId, highlightPlate, routeData, isHighlighted]);
 
-  useEffect(() => {
-    highlightAppliedRef.current = false;
-    highlightFlownRef.current = null;
-  }, [routeId, highlightVehicleId, highlightPlate]);
-
-  useEffect(() => {
-    if (!routeData || (!highlightVehicleId && !highlightPlate)) return;
-    if (highlightAppliedRef.current) return;
-
+  const highlightKey = `${routeId}-${highlightVehicleId ?? ""}-${highlightPlate ?? ""}`;
+  if (
+    routeData &&
+    (highlightVehicleId || highlightPlate) &&
+    resolvedHighlightKey !== highlightKey
+  ) {
     const tourMatch = routeData.tour?.vehicles?.find(isHighlighted);
     const retourMatch = routeData.retour?.vehicles?.find(isHighlighted);
 
-    if (retourMatch && !tourMatch) {
-      setDirection("retour");
-    } else if (tourMatch) {
-      setDirection("tour");
-    }
-
     if (tourMatch || retourMatch) {
-      highlightAppliedRef.current = true;
+      const nextDirection = retourMatch && !tourMatch ? "retour" : "tour";
+      if (direction !== nextDirection) {
+        setDirection(nextDirection);
+      }
+      setResolvedHighlightKey(highlightKey);
     }
-  }, [routeData, highlightVehicleId, highlightPlate, isHighlighted]);
+  }
+
+  useEffect(() => {
+    highlightFlownRef.current = null;
+  }, [routeId, highlightVehicleId, highlightPlate]);
 
   useEffect(() => {
     if (!routeData || !mapRef.current) return;
@@ -191,7 +198,7 @@ export default function RouteMapClient() {
       zoom: 15,
       duration: 900,
     });
-    setSelectedVehicle(target);
+    queueMicrotask(() => setSelectedVehicle(target));
     highlightFlownRef.current = flyKey;
   }, [routeData, direction, routeId, highlightVehicleId, highlightPlate, isHighlighted]);
 
@@ -217,7 +224,7 @@ export default function RouteMapClient() {
           {lineAlerts.length > 0 ? (
             <button
               type="button"
-              onClick={() => setAlertsOpen((o) => !o)}
+              onClick={() => setAlertsManuallyClosed((closed) => !closed)}
               className="flex h-9 w-9 items-center justify-center rounded-xl text-danger transition-colors hover:bg-danger/10"
               aria-label={ro.alerts.activeCount(lineAlerts.length)}
             >
@@ -360,7 +367,7 @@ export default function RouteMapClient() {
               <div className="overflow-hidden rounded-2xl border border-elevated bg-background/95 shadow-xl backdrop-blur-md">
                 <button
                   type="button"
-                  onClick={() => setAlertsOpen(false)}
+                  onClick={() => setAlertsManuallyClosed(true)}
                   className="flex w-full items-center gap-2.5 px-4 py-3 text-left"
                 >
                   <Warning className="h-4 w-4 shrink-0 text-danger" weight="fill" />

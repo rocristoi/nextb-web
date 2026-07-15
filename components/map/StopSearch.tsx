@@ -75,7 +75,7 @@ export function StopSearch({ onSelect, className }: Props) {
             <li className="px-4 py-3 text-[14px] text-muted">{ro.map.noSearchResults}</li>
           )}
           {results.map((stop) => (
-            <li key={stop.stop_id} role="option">
+            <li key={stop.stop_id} role="option" aria-selected={false}>
               <button
                 type="button"
                 className="flex w-full flex-col px-4 py-2.5 text-left hover:bg-elevated"

@@ -13,16 +13,22 @@ type BeforeInstallPromptEvent = Event & {
 
 const DISMISS_KEY = "nextb-install-dismissed";
 
+function getInitialDismissed() {
+  if (typeof window === "undefined") return true;
+  try {
+    return localStorage.getItem(DISMISS_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function InstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
-  const [dismissed, setDismissed] = useState(true);
+  const [dismissed, setDismissed] = useState(getInitialDismissed);
   const reduceMotion = useReducedMotion();
   const isOpen = !dismissed && deferred !== null;
 
   useEffect(() => {
-    if (localStorage.getItem(DISMISS_KEY) === "1") return;
-    setDismissed(false);
-
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);

@@ -13,8 +13,6 @@ import { ro } from "@/lib/i18n";
 import { useAlerts } from "@/lib/hooks/useApi";
 import { ThemeToggle } from "./ThemeToggle";
 import { MoreSheet, MoreNavDesktop } from "./MoreSheet";
-import { linesWithActiveAlerts } from "@/lib/alerts/helpers";
-import { useRoutes } from "@/lib/hooks/useApi";
 import { NexTBLogo } from "../brand/NexTBLogo";
 
 const tabs = [
@@ -72,12 +70,7 @@ function NavItem({
 export function BottomNav() {
   const pathname = usePathname();
   const { data: alertsData } = useAlerts();
-  const { data: routes } = useRoutes();
   const alertCount = alertsData?.notifications.length ?? 0;
-  const linesAlertCount =
-    alertsData && routes
-      ? linesWithActiveAlerts(alertsData.notifications, routes).size
-      : 0;
 
   return (
     <>

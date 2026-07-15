@@ -222,7 +222,12 @@ export async function listAcVoteStatuses(): Promise<AcVoteStatus[]> {
       };
     })
     .filter((r) => vehicleHasAc(r.vehicleId, r.vehicleType))
-    .map(({ vehicleType: _vehicleType, ...status }) => status);
+    .map((r) => ({
+      vehicleId: r.vehicleId,
+      brokenVotes: r.brokenVotes,
+      workingVotes: r.workingVotes,
+      confidence: r.confidence,
+    }));
 }
 
 export function hasAC(vehID: number | null, type: string, confidence?: AcConfidence): boolean {

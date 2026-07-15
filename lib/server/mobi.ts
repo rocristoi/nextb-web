@@ -1,6 +1,11 @@
 import { cache } from "./cache";
 import { serverConfig } from "./config";
 import { normalizePlate } from "@/lib/vehicles/plate";
+import type {
+  MobiDatasetEntry,
+  MobiStationArrivals,
+  MobiVehicleFeedEntry,
+} from "./mobi-types";
 
 const MOBI_FETCH_TIMEOUT_MS = 15000;
 const MOBI_CACHE_TTL_SEC = 12;
@@ -25,28 +30,28 @@ async function fetchCached<T>(cacheKey: string, url: string): Promise<T> {
   return data;
 }
 
-export async function fetchMobiBusData(): Promise<any[]> {
-  return fetchCached<any[]>("mobi_bus_data", serverConfig.mobiBusData());
+export async function fetchMobiBusData(): Promise<MobiVehicleFeedEntry[]> {
+  return fetchCached<MobiVehicleFeedEntry[]>("mobi_bus_data", serverConfig.mobiBusData());
 }
 
-export async function fetchMobiDataset(): Promise<any[]> {
-  return fetchCached<any[]>("mobi_dataset", serverConfig.mobiDataset());
+export async function fetchMobiDataset(): Promise<MobiDatasetEntry[]> {
+  return fetchCached<MobiDatasetEntry[]>("mobi_dataset", serverConfig.mobiDataset());
 }
 
-export async function fetchMobiNextArrivals(stationId: string): Promise<any> {
+export async function fetchMobiNextArrivals(stationId: string): Promise<MobiStationArrivals> {
   const cacheKey = `mobi_next_arrivals_${stationId}`;
-  return fetchCached<any>(
+  return fetchCached<MobiStationArrivals>(
     cacheKey,
     `${serverConfig.mobiNextArrivals()}${stationId}`
   );
 }
 
 export async function buildDatasetIndexes(
-  dataset?: any[]
-): Promise<{ byPlate: Map<string, any>; byInventory: Map<number, any> }> {
+  dataset?: MobiDatasetEntry[]
+): Promise<{ byPlate: Map<string, MobiDatasetEntry>; byInventory: Map<number, MobiDatasetEntry> }> {
   const allDatasets = dataset ?? (await fetchMobiDataset());
-  const byPlate = new Map<string, any>();
-  const byInventory = new Map<number, any>();
+  const byPlate = new Map<string, MobiDatasetEntry>();
+  const byInventory = new Map<number, MobiDatasetEntry>();
   for (const entry of allDatasets) {
     const rawPlate = entry.vehicle?.vehicle?.license_plate;
     if (rawPlate) {
@@ -61,11 +66,11 @@ export async function buildDatasetIndexes(
 }
 
 export function findDatasetEntry(
-  byPlate: Map<string, any>,
-  byInventory: Map<number, any>,
+  byPlate: Map<string, MobiDatasetEntry>,
+  byInventory: Map<number, MobiDatasetEntry>,
   plate: string | null | undefined,
   inventoryId: number | null | undefined
-) {
+): MobiDatasetEntry | undefined {
   if (plate) {
     const byPlateEntry = byPlate.get(normalizePlate(plate));
     if (byPlateEntry) return byPlateEntry;
@@ -77,22 +82,22 @@ export function findDatasetEntry(
 }
 
 export async function buildDatasetByPlate(
-  dataset?: any[]
-): Promise<Map<string, any>> {
+  dataset?: MobiDatasetEntry[]
+): Promise<Map<string, MobiDatasetEntry>> {
   const { byPlate } = await buildDatasetIndexes(dataset);
   return byPlate;
 }
 
-export async function refreshMobiBusData(): Promise<any[]> {
+export async function refreshMobiBusData(): Promise<MobiVehicleFeedEntry[]> {
   cache.del("mobi_bus_data");
   return fetchMobiBusData();
 }
 
 export async function fetchMobiLiveBundle(): Promise<{
-  busData: any[];
-  dataset: any[];
-  datasetByPlate: Map<string, any>;
-  datasetByInventory: Map<number, any>;
+  busData: MobiVehicleFeedEntry[];
+  dataset: MobiDatasetEntry[];
+  datasetByPlate: Map<string, MobiDatasetEntry>;
+  datasetByInventory: Map<number, MobiDatasetEntry>;
 }> {
   const [busData, dataset] = await Promise.all([
     fetchMobiBusData(),

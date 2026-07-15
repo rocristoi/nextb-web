@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +40,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# GTFS auto-downloaded data
+/data/stops.txt
+/data/shapes.txt
+/data/routes.txt
+/data/BUCHAREST-REGION.zip
+/data/BUCHAREST-REGION.zip.tmp
+/assets/data/stops.json
+
+# serwist generated
+/public/sw.js
+/public/sw.js.map
+
+.vercel
+.env*

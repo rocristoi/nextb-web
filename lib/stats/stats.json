@@ -1,0 +1,327 @@
+{
+  "summary": {
+    "buses": 1570,
+    "trolleybuses": 354,
+    "trolleybusesTotal": 486,
+    "trams": 539,
+    "tramsTotal": 622,
+    "stops": 4548,
+    "lines": {
+      "tram": 13,
+      "bus": 171,
+      "trolleybus": 17,
+      "total": 201
+    },
+    "acReports": 18
+  },
+  "buses": {
+    "otokarCount": 400,
+    "citaroCount": 1130,
+    "cityTourCount": 6,
+    "busCount": 34,
+    "total": 1570,
+    "byDepot": [
+      {
+        "depot": "Alexandria",
+        "count": 257
+      },
+      {
+        "depot": "Titan",
+        "count": 240
+      },
+      {
+        "depot": "Ferentari",
+        "count": 228
+      },
+      {
+        "depot": "Pipera",
+        "count": 209
+      },
+      {
+        "depot": "Militari",
+        "count": 183
+      },
+      {
+        "depot": "Nordului",
+        "count": 164
+      },
+      {
+        "depot": "Floreasca",
+        "count": 151
+      },
+      {
+        "depot": "Obregia",
+        "count": 132
+      },
+      {
+        "depot": "Bujoreni",
+        "count": 4
+      },
+      {
+        "depot": "EXH",
+        "count": 1
+      },
+      {
+        "depot": "UTX",
+        "count": 1
+      }
+    ],
+    "kmBuckets": [
+      {
+        "label": "<150k km",
+        "count": 629
+      },
+      {
+        "label": "150–200k km",
+        "count": 321
+      },
+      {
+        "label": ">200k km",
+        "count": 18
+      },
+      {
+        "label": "Necunoscut",
+        "count": 162
+      }
+    ],
+    "citaroWithKm": 968,
+    "citaroAcRetrofit": 17
+  },
+  "trolleybuses": {
+    "active": 354,
+    "retired": 132,
+    "byManufacturer": [
+      {
+        "label": "Astra/Ikarus",
+        "count": 130
+      },
+      {
+        "label": "Solaris",
+        "count": 100
+      },
+      {
+        "label": "Astra/Irisbus",
+        "count": 98
+      },
+      {
+        "label": "Yutong",
+        "count": 22
+      },
+      {
+        "label": "Saurer",
+        "count": 1
+      },
+      {
+        "label": "Astra/irisbus",
+        "count": 1
+      },
+      {
+        "label": "Rocar de Simon",
+        "count": 1
+      },
+      {
+        "label": "Rocar / Autodromo",
+        "count": 1
+      }
+    ],
+    "byModel": [
+      {
+        "label": "415T",
+        "count": 130
+      },
+      {
+        "label": "Trollino 12",
+        "count": 100
+      },
+      {
+        "label": "Citelis 12T",
+        "count": 99
+      },
+      {
+        "label": "U12",
+        "count": 22
+      },
+      {
+        "label": "5 DUK-A",
+        "count": 1
+      },
+      {
+        "label": "412 E",
+        "count": 1
+      },
+      {
+        "label": "812 EA",
+        "count": 1
+      }
+    ],
+    "byDepot": [
+      {
+        "label": "Bujoreni",
+        "count": 92
+      },
+      {
+        "label": "Vatra Luminoasă",
+        "count": 91
+      },
+      {
+        "label": "Berceni",
+        "count": 56
+      },
+      {
+        "label": "-",
+        "count": 50
+      },
+      {
+        "label": "Bucureştii-Noi",
+        "count": 36
+      },
+      {
+        "label": "Bucureştii - Noi",
+        "count": 10
+      },
+      {
+        "label": "Bucureştii – Noi",
+        "count": 9
+      },
+      {
+        "label": "Bucureştii –\n  Noi",
+        "count": 5
+      },
+      {
+        "label": "Bucureştii -\n  Noi",
+        "count": 2
+      },
+      {
+        "label": "Bucurestii –\n  Noi",
+        "count": 2
+      }
+    ],
+    "byDecade": [
+      {
+        "label": "2000s",
+        "count": 176
+      },
+      {
+        "label": "2020s",
+        "count": 100
+      },
+      {
+        "label": "1990s",
+        "count": 55
+      },
+      {
+        "label": "Necunoscut",
+        "count": 22
+      },
+      {
+        "label": "1960s",
+        "count": 1
+      }
+    ]
+  },
+  "trams": {
+    "active": 539,
+    "retired": 83,
+    "withAc": 65,
+    "byType": [
+      {
+        "label": "V3A-93",
+        "count": 235
+      },
+      {
+        "label": "Imperio Metropolitan",
+        "count": 87
+      },
+      {
+        "label": "Tatra T4R",
+        "count": 60
+      },
+      {
+        "label": "V3A-93M",
+        "count": 44
+      },
+      {
+        "label": "V3A-93-CH-PPC",
+        "count": 44
+      },
+      {
+        "label": "V3A-2S-93",
+        "count": 14
+      },
+      {
+        "label": "Bucur LF-CA",
+        "count": 11
+      },
+      {
+        "label": "V2A-T",
+        "count": 9
+      },
+      {
+        "label": "1VU",
+        "count": 8
+      },
+      {
+        "label": "3VU",
+        "count": 6
+      },
+      {
+        "label": "Bucur LF",
+        "count": 5
+      },
+      {
+        "label": "M5.65",
+        "count": 5
+      }
+    ],
+    "byDepot": [
+      {
+        "label": "Militari",
+        "count": 101
+      },
+      {
+        "label": "Alexandria",
+        "count": 82
+      },
+      {
+        "label": "Colentina",
+        "count": 78
+      },
+      {
+        "label": "Bucureştii - Noi",
+        "count": 68
+      },
+      {
+        "label": "Titan",
+        "count": 62
+      },
+      {
+        "label": "Giurgiului",
+        "count": 54
+      },
+      {
+        "label": "Dudeşti",
+        "count": 48
+      },
+      {
+        "label": "Victoria",
+        "count": 45
+      },
+      {
+        "label": "Secţia Linii",
+        "count": 1
+      }
+    ]
+  },
+  "network": {
+    "lines": {
+      "tram": 13,
+      "bus": 171,
+      "trolleybus": 17,
+      "total": 201
+    },
+    "stops": 4548
+  },
+  "community": {
+    "legacyAcReports": 18
+  }
+}

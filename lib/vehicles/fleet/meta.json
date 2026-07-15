@@ -1,0 +1,77 @@
+{
+  "otokar": {
+    "source": "metrouusor.com — OTOKAR KENT (august 2019)",
+    "count": 400,
+    "fields": [
+      "inventory",
+      "plate",
+      "vin",
+      "depot"
+    ]
+  },
+  "citaro": {
+    "source": "metrouusor.com — MERCEDES-BENZ CITARO și transport-in-comun.ro (iunie 2026)",
+    "count": 1000,
+    "fields": [
+      "inventory",
+      "plate",
+      "depot",
+      "km",
+      "details"
+    ]
+  },
+  "cityTour": {
+    "source": "Bucharest City Tour — Volvo B9R UNVI Urbis",
+    "count": 6,
+    "fields": [
+      "inventory",
+      "plate",
+      "depot"
+    ]
+  },
+  "trolleybus": {
+    "source": "transport-in-comun.ro/bucuresti — parc_troleibuze.csv + date NexTB (Iun. 2026)",
+    "count": 486,
+    "fields": [
+      "inventory",
+      "plate",
+      "depot",
+      "yearBuilt",
+      "axles",
+      "manufacturer",
+      "modelType",
+      "imported",
+      "observations"
+    ]
+  },
+  "allBuses": {
+    "source": "transport-in-comun.ro/bucuresti — Parc autobuze S.T.B.",
+    "count": 164,
+    "fields": [
+      "inventory",
+      "plate",
+      "depot",
+      "yearBuilt",
+      "axles",
+      "manufacturer",
+      "modelType",
+      "imported",
+      "observations"
+    ]
+  },
+  "tram": {
+    "source": "transport-in-comun.ro/bucuresti — Parc tramvaie S.T.B. (Iul. 2026)",
+    "count": 622,
+    "fields": [
+      "inventory",
+      "plate",
+      "depot",
+      "yearBuilt",
+      "axles",
+      "manufacturer",
+      "modelType",
+      "imported",
+      "observations"
+    ]
+  }
+}

@@ -9,7 +9,7 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   "/alerts": "/app/alerts",
 };
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (LEGACY_REDIRECTS[pathname]) {

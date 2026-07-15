@@ -322,4 +322,3 @@ Keep PRs focused. One fleet file, one operator, or one logic fix per PR is easie
 - [transport-in-comun.ro](https://transport-in-comun.ro/bucuresti/) - STB fleet exports
 - [TPBI](https://tpbi.ro/) and [mo-bi](https://mo-bi.ro/) - GTFS and live APIs
 - Alexandru Mihai Nenciu - Bucharest logo
-- Everyone who reported faulty AC and contributed fleet data over the years

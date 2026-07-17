@@ -230,7 +230,7 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center justify-between border-t border-elevated py-2.5 text-[14px]">
               <span className="text-muted">{ro.settings.developer}</span>
-              <span className="font-medium text-foreground">Cristian Capotă</span>
+              <a className="font-medium text-foreground underline" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/cristian-capot%C4%83-33a108214/">Cristian Capotă</a>
             </div>
           </div>
         </Card>

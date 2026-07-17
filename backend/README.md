@@ -2,7 +2,6 @@
 
 Standalone Fastify service for mo-bi live data, GTFS processing, fleet lookup, STB alerts, and AC voting. The Next.js PWA frontend talks to this service over HTTP.
 
-No build step — runs directly with Node and `tsx`.
 
 ## Architecture
 
@@ -10,7 +9,7 @@ No build step — runs directly with Node and `tsx`.
 Browser / PWA (frontend host)
         │  NEXT_PUBLIC_API_URL
         ▼
-Reverse proxy / TLS (optional)
+Reverse proxy / TLS
         │
         ▼
 NexTB API (Node) — :8080
@@ -79,16 +78,6 @@ sudo systemctl status nextb-api
 
 The unit file is at `backend/deploy/systemd/nextb-api.service`. Update `User=` and `WorkingDirectory=` for your server.
 
-### CI/CD (GitHub Actions)
-
-Deploy jobs use a **self-hosted runner** on the API host:
-
-1. GitHub → **Settings → Actions → Runners → New self-hosted runner**
-2. Install on the server that runs the API
-3. Push to `main` triggers `.github/workflows/deploy-backend.yml`
-
-Add repository secret **`CRON_SECRET`** (same value as in `backend/.env`) for optional GTFS refresh after deploy.
-
 ### Frontend configuration
 
 Set on the frontend host (e.g. Vercel):
@@ -106,7 +95,6 @@ Ensure `CORS_ORIGIN` in `backend/.env` includes the frontend origin.
 - **Rate limiting** — on AC reports and vehicle search
 - **Input validation** — Zod schemas on POST endpoints
 - **Cron auth** — `GET /api/cron/gtfs-refresh` requires `Authorization: Bearer $CRON_SECRET`
-- **Secrets** — keep `DATABASE_URL`, `CRON_SECRET` in `backend/.env` only; never commit them
 
 ## GTFS refresh
 

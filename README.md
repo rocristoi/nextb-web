@@ -49,7 +49,7 @@ For each line at the stop, we filter `busData` to vehicles where `routeId` and `
 
 #### Step 2: Load GTFS context
 
-GTFS is downloaded from [gtfs.tpbi.ro/regional](https://gtfs.tpbi.ro/regional/BUCHAREST-REGION.zip) on first run (and refreshed daily via cron in production). Files land in `data/`:
+GTFS is downloaded from [gtfs.tpbi.ro/regional](https://gtfs.tpbi.ro/regional/BUCHAREST-REGION.zip) on first run (and refreshed daily via cron). Files land in `data/`:
 
 | File | Used for |
 |------|----------|

@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import path from "node:path";
 import { REPO_ROOT } from "@/lib/repo-root";
 
-// Load backend/.env first, then repo-root .env as fallback.
 dotenv.config({ path: path.join(REPO_ROOT, "backend", ".env") });
 dotenv.config({ path: path.join(REPO_ROOT, ".env") });
 

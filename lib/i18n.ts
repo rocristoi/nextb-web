@@ -95,11 +95,11 @@ export const ro = {
   map: {
     loadingStops: "Se încarcă stațiile…",
     loadError:
-      "Nu s-au putut încărca datele hărții. GTFS se poate descărca încă — încearcă din nou curând.",
+      "Nu s-au putut încărca datele hărții. Încearcă din nou curând.",
     centerLocation: "Locația mea",
     myLocation: "Locația mea",
     stop: (id: string) => `Stația ${id}`,
-    searchPlaceholder: "Caută stație…",
+    searchPlaceholder: "Caută o stație…",
     noSearchResults: "Nicio stație găsită",
   },
   theme: {
@@ -163,7 +163,7 @@ export const ro = {
     ac: "Climatizare",
     source: (text: string) => `Sursă: ${text}`,
     statsTitle: "Statisticile noastre",
-    statsSubtitle: "Parc vehicule, rețea GTFS și date comunitare",
+    statsSubtitle: "Parcul de vehicule, rețeaua GTFS și alte date pe care aplicația le folosește",
     tabBuses: "Autobuze",
     tabTrolleybuses: "Troleibuze",
     tabTrams: "Tramvaie",
@@ -226,7 +226,7 @@ export const ro = {
     subtitle: "Personalizează-ți experiența",
     display: "Afișare",
     appearance: "Temă",
-    appearanceHint: "Alege modul deschis sau închis",
+    appearanceHint: "Alege modul luminoz sau întunecat",
     additionalInfo: "Informații suplimentare vehicul",
     additionalInfoHint: "Număr, ID, statistici secundare",
     primaryDetail: "Detaliu principal",
@@ -244,7 +244,7 @@ export const ro = {
   },
   alerts: {
     title: "Alerte STB",
-    subtitle: "Notificări oficiale STB pentru București",
+    subtitle: "Notificările oficiale STB",
     active: (count: number) =>
       count === 1 ? "alertă activă" : "alerte active",
     activeCount: (count: number) =>
@@ -267,7 +267,7 @@ export const ro = {
     subtitle: "Raportează sau verifică statusul AC al vehiculelor",
     howItWorks: "Cum funcționează",
     howItWorksText:
-      "Raportează AC defect sau funcțional. La 1–4 raportări, statusul devine „incert”. La 5+ raportări, vehiculul apare cu statusul de AC defect.",
+      "Raportează statusul aerului condiționat: defect sau funcțional. La 1–4 raportări, statusul devine „incert”. La 5+ raportări, vehiculul apare cu statusul de AC defect.",
     vehicleIdPlaceholder: "ID vehicul",
     reportBroken: "AC defect",
     reportWorking: "AC funcționează",
@@ -291,7 +291,7 @@ export const ro = {
   },
   install: {
     title: "Instalează NexTB",
-    description: "Adaugă nexTB pe ecranul principal al dispozitivului tău pentru o experiență mai rapidă.",
+    description: "Adaugă nexTB pe ecranul principal al dispozitivului tău pentru accesibilitate.",
     install: "Instalează",
     notNow: "Nu acum",
     dismiss: "Respinge",

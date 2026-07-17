@@ -71,7 +71,7 @@ function ThemeSegmented() {
   const isDark = theme === "dark";
 
   return (
-    <div className="flex rounded-xl bg-elevated p-1">
+    <div className="flex w-full rounded-xl bg-elevated p-1">
       {(
         [
           { id: "light" as const, icon: Sun, label: ro.theme.light },
@@ -87,13 +87,13 @@ function ThemeSegmented() {
               if ((id === "dark") !== isDark) toggleTheme();
             }}
             className={cn(
-              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-all duration-200",
+              "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-[13px] font-medium whitespace-nowrap transition-all duration-200",
               active
                 ? "bg-card text-foreground shadow-sm"
                 : "text-muted hover:text-foreground"
             )}
           >
-            <Icon className="h-3.5 w-3.5" weight={active ? "fill" : "regular"} />
+            <Icon className="h-3.5 w-3.5 shrink-0" weight={active ? "fill" : "regular"} />
             {label}
           </button>
         );
@@ -157,9 +157,20 @@ export default function SettingsPage() {
         <SectionLabel>{ro.settings.display}</SectionLabel>
 
         <Card className="overflow-hidden p-0">
-          <SettingsRow icon={Sun} title={ro.settings.appearance} hint={undefined} >
+          <div className="px-4 py-3.5">
+            <div className="mb-3 flex items-center gap-3">
+              <SettingsIcon icon={Sun} />
+              <div>
+                <p className="text-[15px] font-medium leading-snug text-foreground">
+                  {ro.settings.appearance}
+                </p>
+                <p className="mt-0.5 text-[13px] leading-snug text-muted">
+                  {ro.settings.appearanceHint}
+                </p>
+              </div>
+            </div>
             <ThemeSegmented />
-          </SettingsRow>
+          </div>
 
           <SettingsRow
             icon={Info}

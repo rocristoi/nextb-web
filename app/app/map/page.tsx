@@ -70,7 +70,7 @@ export default function MapPage() {
   return (
     <div className="flex h-[calc(100dvh-4.5rem)] min-w-0 flex-col overflow-x-hidden lg:h-dvh lg:flex-row">
       <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden">
-        <div className="absolute inset-x-0 top-0 z-20 px-3 pt-3 lg:max-w-md">
+        <div className="absolute inset-x-0 top-0 z-20 pl-3 pr-[3.25rem] pt-3 lg:max-w-md lg:pr-3">
           <StopSearch onSelect={handleSearchSelect} />
         </div>
         <div className="h-full min-w-0">

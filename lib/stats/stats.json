@@ -173,56 +173,28 @@
       },
       {
         "label": "Bucureştii-Noi",
-        "count": 36
-      },
-      {
-        "label": "Bucureştii - Noi",
-        "count": 10
-      },
-      {
-        "label": "Bucureştii – Noi",
-        "count": 9
-      },
-      {
-        "label": "Bucureştii –\n  Noi",
-        "count": 5
-      },
-      {
-        "label": "Bucureştii -\n  Noi",
-        "count": 2
-      },
-      {
-        "label": "Bucurestii –\n  Noi",
-        "count": 2
+        "count": 64
       }
     ],
     "byDecade": [
       {
-        "label": "2000s",
+        "label": "Anii 2000",
         "count": 176
       },
       {
-        "label": "2020s",
+        "label": "Anii 2020",
         "count": 100
       },
       {
-        "label": "1990s",
+        "label": "Anii 1990",
         "count": 55
-      },
-      {
-        "label": "Necunoscut",
-        "count": 22
-      },
-      {
-        "label": "1960s",
-        "count": 1
       }
     ]
   },
   "trams": {
     "active": 539,
     "retired": 83,
-    "withAc": 65,
+    "withAc": 100,
     "byType": [
       {
         "label": "V3A-93",
@@ -230,7 +202,7 @@
       },
       {
         "label": "Imperio Metropolitan",
-        "count": 87
+        "count": 100
       },
       {
         "label": "Tatra T4R",

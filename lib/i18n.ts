@@ -3,11 +3,24 @@
 export const ro = {
   app: {
     name: "NexTB",
-    title: "NexTB: Transport București",
+    title: "NexTB: Transport public București",
     description:
-      "STB în timp real: tramvaie, autobuze și troleibuze în București, cu detalii vehicule, status AC și hărți de traseu.",
+      "Când vine următorul autobuz, tramvai sau troleibuz? Vezi modelul, câți pasageri sunt la bord, dacă merge aerul condiționat și alertele STB.",
+    ogAlt: "NexTB: transportul public din București în timp real",
     tagline: "Transport București",
-    manifestDescription: "Tracker STB în timp real pentru București",
+    manifestDescription: "Sosiri STB în timp real pentru București",
+    keywords: [
+      "STB",
+      "București",
+      "autobuz",
+      "tramvai",
+      "troleibuz",
+      "transport public",
+      "sosiri",
+      "aer condiționat",
+      "alerte STB",
+      "TPBI",
+    ] as string[],
   },
   legal: {
     termsTitle: "Termeni și condiții",

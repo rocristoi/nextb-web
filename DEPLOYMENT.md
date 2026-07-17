@@ -51,6 +51,7 @@ Set in your frontend host (e.g. Vercel → Project → Settings → Environment 
 | Variable | Required | Notes |
 |----------|----------|-------|
 | `NEXT_PUBLIC_API_URL` | Yes | API base URL, e.g. `https://api.example.com` (no trailing slash) |
+| `NEXT_PUBLIC_SITE_URL` | Recommended | Public site origin for Open Graph / canonical URLs |
 
 Local development:
 

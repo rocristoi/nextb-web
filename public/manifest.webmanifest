@@ -1,7 +1,7 @@
 {
   "name": "NexTB",
   "short_name": "NexTB",
-  "description": "Tracker STB în timp real pentru București",
+  "description": "Sosiri STB în timp real pentru București",
   "lang": "ro",
   "start_url": "/app/home",
   "display": "standalone",

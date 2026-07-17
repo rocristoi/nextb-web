@@ -3,7 +3,7 @@
 export const ro = {
   app: {
     name: "NexTB",
-    title: "NexTB — Transport București",
+    title: "NexTB: Transport București",
     description:
       "STB în timp real: tramvaie, autobuze și troleibuze în București, cu detalii vehicule, status AC și hărți de traseu.",
     tagline: "Transport București",
@@ -50,6 +50,10 @@ export const ro = {
     label: "Vezi codul sursă",
     repo: "github.com/rocristoi/nextb-web",
   },
+  marketing: {
+    openApp: "Deschide aplicația",
+    openAppShort: "Deschide",
+  },
   nav: {
     home: "Acasă",
     settings: "Setări",
@@ -75,7 +79,7 @@ export const ro = {
     addFavorite: "Adaugă la favorite",
     removeFavorite: "Elimină din favorite",
     disclaimerBanner:
-      "NexTB este un proiect independent care completează InfoTB -nu îl înlocuiește. Pentru informații complete și corecte, consultați aplicația oficială InfoTB.",
+      "NexTB este un proiect independent care completează InfoTB -nu îl înlocuiește. Pentru informații oficiale, consultați aplicația oficială InfoTB.",
     dismissBanner: "Am înțeles",
   },
   comfort: {

@@ -47,11 +47,15 @@ next-env.d.ts
 /data/routes.txt
 /data/BUCHAREST-REGION.zip
 /data/BUCHAREST-REGION.zip.tmp
+/data/gtfs-manifest.json
 /assets/data/stops.json
 
 # serwist generated
 /public/sw.js
 /public/sw.js.map
+
+# backend build output
+/backend/dist
 
 .vercel
 .env*

@@ -2,7 +2,7 @@
 
 NexTB is a Next.js PWA for real-time Bucharest transit (STB trams, buses, and trolleybuses). It shows when vehicles are arriving at a stop, which vehicle it is (inventory ID, plate, illustration), how crowded it is, and whether the AC is likely working.
 
-All mo-bi API calls run server-side in Next.js Route Handlers. There is no separate backend and no API key between frontend and server.
+The **frontend** (this repo) is a client-only PWA, typically deployed to a static/edge host. The **API** lives in [`backend/`](backend/) — a standalone Fastify service you run on your own infrastructure. Set `NEXT_PUBLIC_API_URL` to point the app at your API base URL.
 
 ---
 
@@ -27,11 +27,11 @@ When you tap a stop, the app calls `GET /api?stationID=…` every **45 seconds**
 
 ### The app (frontend)
 
-The PWA loads stop locations from parsed GTFS data (`assets/data/stops.json`). The map is MapLibre; favorites and settings live in the browser (Zustand + localStorage). When you select a stop, `StationPanel` polls the API via SWR.
+The PWA loads stop locations from the API (`GET /api/getstops`). The map is MapLibre; favorites and settings live in the browser (Zustand + localStorage). When you select a stop, `StationPanel` polls the API via SWR.
 
 ### The API (backend logic)
 
-All of this runs in `lib/server/` and is triggered from `app/api/route.ts`.
+All of this runs in [`lib/server/`](lib/server/) and is served by the [`backend/`](backend/) API service.
 
 #### Step 1: Ask mo-bi what is happening at your stop
 
@@ -165,7 +165,7 @@ STB vehicle illustrations and metadata live in the repo. Regional operators (STC
 
 | File | Role |
 |------|------|
-| `lib/vehicles/fleet/lookup.json` | Master registry keyed by inventory ID (`"4661"` → record). Used by `getFleetInfo()` and vehicle search (`app/api/vehicle/search`). |
+| `lib/vehicles/fleet/lookup.json` | Master registry keyed by inventory ID (`"4661"` → record). Used by `getFleetInfo()` and vehicle search (`GET /api/vehicle/search`). |
 | `lib/vehicles/fleet/meta.json` | Sources and field lists per family (counts, where the data came from). |
 | `lib/vehicles/fleet/otokar.json` | Otokar Kent buses: inventory, plate, VIN, depot. |
 | `lib/vehicles/fleet/citaro.json` | Mercedes Citaro: inventory, plate, depot, km, AC retrofit notes in `details`. |
@@ -220,31 +220,27 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The first launch downloads GTFS from TPBI. It can take a minute.
+Open [http://localhost:3000](http://localhost:3000). For full functionality, run the API locally — see [`backend/README.md`](backend/README.md).
 
 Production build:
 
 ```bash
-npm run build   # runs gtfs:prepare first
+npm run build
 npm start
 ```
 
-Deploy to Vercel: see [`DEPLOYMENT.md`](DEPLOYMENT.md).
+**Frontend:** deploy to your static/edge host (see [`DEPLOYMENT.md`](DEPLOYMENT.md)).  
+**API:** deploy [`backend/`](backend/) separately (Docker recommended).
 
 ### Environment variables
 
-Copy from [`.env.example`](.env.example). Important ones:
+Copy from [`.env.example`](.env.example). The frontend mainly needs:
 
 | Variable | Purpose |
 |----------|---------|
-| `CORS_MOBI_BUS_DATA` / `CORS_MOBI_NEXT_ARRIVALS` / `CORS_MOBI_DATASET` | mo-bi endpoints |
-| `GTFS_STOPS_FILE` / `GTFS_SHAPES_FILE` | Paths under `data/` |
-| `LINE_CHECK_COOLDOWN` | Max vehicle GPS age in **seconds** before refetch |
-| `STOP_SPACING_METERS` | Meters per stop for stops-away estimate (default 350) |
-| `MIN_MINUTES_PER_STOP` | Minutes added per stop for follower ETAs (default 2) |
-| `DATABASE_URL` | Neon Postgres for AC votes (required in production) |
-| `DEVICE_HASH_SALT` | Hash salt for AC report device identity (required in production) |
-| `CRON_SECRET` | Protects `/api/cron/gtfs-refresh` in production |
+| `NEXT_PUBLIC_API_URL` | Base URL of the NexTB API (no trailing slash) |
+
+Backend secrets (`DATABASE_URL`, `CRON_SECRET`, mo-bi URLs, etc.) belong in `backend/.env` — see [`backend/.env.example`](backend/.env.example).
 
 ### Tests
 
@@ -258,12 +254,13 @@ Manual checklist: [`TESTING.md`](TESTING.md). Migrations: [`tests/db/migrations/
 
 ### Tech stack
 
-- Next.js 16 App Router, TypeScript, Tailwind CSS 4
+- Next.js 16 App Router, TypeScript, Tailwind CSS 4 (frontend)
+- Fastify API in `backend/` (see [`backend/README.md`](backend/README.md))
 - MapLibre GL + react-map-gl + supercluster
 - Zustand, SWR, Vaul, Framer Motion
 - @serwist/next PWA
 
-For scheduled GTFS refresh, Vercel Cron calls `GET /api/cron/gtfs-refresh` daily at 3 AM UTC with `Authorization: Bearer <CRON_SECRET>`. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for full production setup.
+See [`DEPLOYMENT.md`](DEPLOYMENT.md) for production setup.
 
 ---
 

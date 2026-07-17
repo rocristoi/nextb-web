@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { CacheFirst, Serwist } from "serwist";
+import { CacheFirst, NetworkOnly, Serwist } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -17,6 +17,11 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
+    // Live API data must not be cached or time out in the service worker.
+    {
+      matcher: ({ url }) => url.pathname.startsWith("/api/"),
+      handler: new NetworkOnly(),
+    },
     ...defaultCache,
     {
       matcher: ({ url }) => url.pathname.startsWith("/vehicles/"),

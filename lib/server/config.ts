@@ -1,7 +1,8 @@
 import path from "path";
+import { REPO_ROOT } from "../repo-root";
 
-export const DATA_DIR = path.join(process.cwd(), "data");
-export const ASSETS_DATA_DIR = path.join(process.cwd(), "assets", "data");
+export const DATA_DIR = path.join(REPO_ROOT, "data");
+export const ASSETS_DATA_DIR = path.join(REPO_ROOT, "assets", "data");
 
 export const PATHS = {
   noAC: path.join(DATA_DIR, "noAC.json"),
@@ -12,6 +13,7 @@ export const PATHS = {
   routesTxt: path.join(DATA_DIR, "routes.txt"),
   gtfsZip: path.join(DATA_DIR, "BUCHAREST-REGION.zip"),
   gtfsZipTmp: path.join(DATA_DIR, "BUCHAREST-REGION.zip.tmp"),
+  gtfsManifest: path.join(DATA_DIR, "gtfs-manifest.json"),
 };
 
 export function getEnv(name: string, fallback?: string): string {

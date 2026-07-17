@@ -19,7 +19,15 @@ const PATHS = {
   stopsTxt: path.join(DATA_DIR, "stops.txt"),
   gtfsZip: path.join(DATA_DIR, "BUCHAREST-REGION.zip"),
   gtfsZipTmp: path.join(DATA_DIR, "BUCHAREST-REGION.zip.tmp"),
+  gtfsManifest: path.join(DATA_DIR, "gtfs-manifest.json"),
 };
+
+const BUNDLE_FILES = [
+  { key: "stops.txt", path: PATHS.stopsTxt },
+  { key: "routes.txt", path: path.join(DATA_DIR, "routes.txt") },
+  { key: "shapes.txt", path: path.join(DATA_DIR, "shapes.txt") },
+  { key: "stops.json", path: PATHS.stopsJson },
+];
 
 async function fileHash(filePath) {
   return new Promise((resolve) => {
@@ -32,6 +40,44 @@ async function fileHash(filePath) {
   });
 }
 
+function readManifest() {
+  if (!fs.existsSync(PATHS.gtfsManifest)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(PATHS.gtfsManifest, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+async function writeManifest(zipSha256) {
+  const files = {};
+  for (const { key, path: filePath } of BUNDLE_FILES) {
+    const hash = await fileHash(filePath);
+    if (!hash) throw new Error(`Cannot hash missing GTFS file: ${key}`);
+    files[key] = hash;
+  }
+  fs.writeFileSync(
+    PATHS.gtfsManifest,
+    JSON.stringify({ zipSha256, files, updatedAt: new Date().toISOString() }, null, 2),
+    "utf8"
+  );
+}
+
+async function isBundleReady() {
+  if (!BUNDLE_FILES.every(({ path: filePath }) => fs.existsSync(filePath))) return false;
+  const manifest = readManifest();
+  if (!manifest) return false;
+  for (const { key, path: filePath } of BUNDLE_FILES) {
+    const actual = await fileHash(filePath);
+    if (actual !== manifest.files?.[key]) return false;
+  }
+  if (fs.existsSync(PATHS.gtfsZip)) {
+    const zipHash = await fileHash(PATHS.gtfsZip);
+    if (zipHash !== manifest.zipSha256) return false;
+  }
+  return true;
+}
+
 async function downloadFile(url, destPath) {
   const dir = path.dirname(destPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -42,15 +88,27 @@ async function downloadFile(url, destPath) {
 
 async function main() {
   try {
+    if (await isBundleReady()) {
+      console.log("[gtfs-prepare] Bundle present and checksums match, skipping.");
+      return;
+    }
+
     await downloadFile(STOPS_ZIP_URL, PATHS.gtfsZipTmp);
     const newHash = await fileHash(PATHS.gtfsZipTmp);
     const oldHash = await fileHash(PATHS.gtfsZip);
     if (newHash && oldHash && newHash === oldHash) {
       fs.unlinkSync(PATHS.gtfsZipTmp);
-      console.log("[gtfs-prepare] ZIP unchanged, skipping.");
-      return;
+      if (!readManifest()) await writeManifest(newHash);
+      if (await isBundleReady()) {
+        console.log("[gtfs-prepare] ZIP unchanged, skipping.");
+        return;
+      }
+      console.log("[gtfs-prepare] ZIP unchanged but checksums stale, re-extracting.");
+    } else {
+      fs.renameSync(PATHS.gtfsZipTmp, PATHS.gtfsZip);
     }
-    fs.renameSync(PATHS.gtfsZipTmp, PATHS.gtfsZip);
+
+    const zipSha256 = (await fileHash(PATHS.gtfsZip)) ?? newHash;
 
     const filesToExtract = ["stops.txt", "routes.txt", "shapes.txt"];
     const extracted = { stops: false, routes: false, shapes: false };
@@ -95,6 +153,7 @@ async function main() {
     }
     fs.mkdirSync(ASSETS_DATA_DIR, { recursive: true });
     fs.writeFileSync(PATHS.stopsJson, JSON.stringify(stops, null, 2), "utf8");
+    await writeManifest(zipSha256);
     console.log("[gtfs-prepare] Downloaded and converted stops.");
   } catch (err) {
     console.warn("[gtfs-prepare] Failed, using committed data:", err?.message ?? err);

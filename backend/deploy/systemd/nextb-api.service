@@ -1,0 +1,16 @@
+[Unit]
+Description=NexTB API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/opt/nextb-web
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/npm run start --workspace=backend
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

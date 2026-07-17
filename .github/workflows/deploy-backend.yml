@@ -1,0 +1,56 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "backend/**"
+      - "lib/**"
+      - "scripts/gtfs-prepare.mjs"
+      - "data/**"
+      - ".github/workflows/deploy-backend.yml"
+
+concurrency:
+  group: deploy-backend-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Ensure backend environment file
+        working-directory: backend
+        run: |
+          if [ ! -f .env ]; then
+            cp .env.example .env
+            echo "::warning::Created backend/.env from example — configure secrets on the server."
+          fi
+
+      - name: Prepare GTFS data
+        run: npm run gtfs:prepare --workspace=backend
+
+      - name: Restart API service
+        run: sudo systemctl restart nextb-api
+
+      - name: Health check
+        run: curl -fsS "http://127.0.0.1:${API_PORT:-8080}/health"
+
+      - name: Refresh GTFS (optional)
+        if: github.event_name == 'push'
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -n "$CRON_SECRET" ]; then
+            curl -fsS -H "Authorization: Bearer $CRON_SECRET" \
+              "http://127.0.0.1:${API_PORT:-8080}/api/cron/gtfs-refresh" || true
+          fi

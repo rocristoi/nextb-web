@@ -37,10 +37,6 @@ if [ -f "$API_DIR/deploy/systemd/nextb-api.service" ]; then
   sudo systemctl enable nextb-api
 fi
 
-echo "==> GitHub Actions self-hosted runner (optional)..."
-echo "  Settings → Actions → Runners → New self-hosted runner"
-echo "  Install on this host if you use deploy-backend.yml from a private network."
-
 echo "Done. Next steps:"
 echo "  1. Edit $API_DIR/.env"
 echo "  2. sudo systemctl start nextb-api"

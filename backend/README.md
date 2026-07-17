@@ -99,7 +99,7 @@ Ensure `CORS_ORIGIN` in `backend/.env` includes the frontend origin.
 ## GTFS refresh
 
 - **Deploy:** run `npm run gtfs:prepare --workspace=backend` once (or on each deploy)
-- **Runtime:** `GET /api/cron/gtfs-refresh` with `Authorization: Bearer $CRON_SECRET` — schedule via cron or the deploy workflow
+- **Runtime:** `GET /api/cron/gtfs-refresh` with `Authorization: Bearer $CRON_SECRET` — schedule via cron
 
 ## Environment
 

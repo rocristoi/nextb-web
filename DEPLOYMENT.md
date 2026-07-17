@@ -23,7 +23,7 @@ psql "$DATABASE_URL" -f tests/db/migrations/001_ac_votes.sql
 
 ## 1. Deploy the API
 
-See [`backend/README.md`](backend/README.md) for environment variables, GTFS refresh, and CI/CD.
+See [`backend/README.md`](backend/README.md) for environment variables and GTFS refresh.
 
 Minimum steps:
 
@@ -87,6 +87,5 @@ vercel --prod   # production
 |----------|---------|
 | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Frontend lint, unit tests, e2e |
 | [`.github/workflows/backend-ci.yml`](.github/workflows/backend-ci.yml) | API typecheck |
-| [`.github/workflows/deploy-backend.yml`](.github/workflows/deploy-backend.yml) | API deploy (self-hosted runner) |
 
 For local testing, see [`TESTING.md`](TESTING.md).

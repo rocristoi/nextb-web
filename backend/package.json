@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "gtfs:prepare": "node ../scripts/gtfs-prepare.mjs",
     "lint": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },

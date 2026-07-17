@@ -21,7 +21,6 @@ fi
 echo "==> Install dependencies..."
 cd "$REPO_DIR"
 npm ci
-npm run gtfs:prepare --workspace=backend || true
 
 echo "==> Configure environment..."
 if [ ! -f "$API_DIR/.env" ]; then

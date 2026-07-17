@@ -26,6 +26,8 @@ export async function registerStopsRoutes(app: FastifyInstance) {
     const cached = cache.get<ReturnType<typeof buildStopSearchIndex>>(cacheKey);
     if (cached) return cached;
 
+    await ensureGtfsData();
+
     try {
       const stops = getStopsJson();
       const index = buildStopSearchIndex(stops);

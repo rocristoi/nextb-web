@@ -21,6 +21,8 @@ async function bootstrap() {
       level: env.nodeEnv === "production" ? "info" : "debug",
     },
     trustProxy: true,
+    // Station handler is "/" under prefix "/api" → "/api/"; frontend calls "/api?stationID=…"
+    ignoreTrailingSlash: true,
   });
 
   await app.register(helmet, { contentSecurityPolicy: false });

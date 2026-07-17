@@ -30,12 +30,13 @@ Minimum steps:
 ```bash
 cp backend/.env.example backend/.env   # configure secrets
 npm ci
-npm run gtfs:prepare --workspace=backend
 npm run start:api
 curl http://127.0.0.1:8080/health
 ```
 
-For a persistent service, use systemd — see `backend/deploy/systemd/nextb-api.service`.
+GTFS downloads automatically on API start when the local bundle is missing or stale (`ensureGtfsData`). Schedule refreshes with `GET /api/cron/gtfs-refresh` and `Authorization: Bearer $CRON_SECRET`.
+
+For a persistent service, use systemd — see `backend/deploy/systemd/nextb-api.service` (set `WorkingDirectory=` to your clone path; the unit defaults to `/opt/nextb-web`).
 
 Expose the service via your reverse proxy with HTTPS, e.g. `https://api.example.com`.
 

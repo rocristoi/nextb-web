@@ -5,7 +5,7 @@
 ```bash
 npm run test:unit     # Vitest (tests/unit)
 npm run test:e2e      # Playwright smoke test (tests/e2e)
-npm run test:ci       # unit + build + e2e (same as CI)
+npm run test:ci       # unit + build + e2e (CI also runs lint separately)
 ```
 
 CI runs on push/PR via [`.github/workflows/ci.yml`](.github/workflows/ci.yml): lint, unit tests, production build, then one Playwright smoke test.
@@ -31,7 +31,7 @@ CI runs on push/PR via [`.github/workflows/ci.yml`](.github/workflows/ci.yml): l
 
 - `DATABASE_URL` — Neon for persistent AC votes (required in production; in-memory fallback locally)
 - `DEVICE_HASH_SALT` — required in production for AC reports
-- `CRON_SECRET` — required in production for GTFS cron (Bearer token from Vercel Cron)
+- `CRON_SECRET` — required in production for `GET /api/cron/gtfs-refresh` on the API (Bearer token; schedule with system cron or any HTTP scheduler)
 
 Production deployment: [`DEPLOYMENT.md`](DEPLOYMENT.md).
 

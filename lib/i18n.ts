@@ -226,7 +226,7 @@ export const ro = {
     subtitle: "Personalizează-ți experiența",
     display: "Afișare",
     appearance: "Temă",
-    appearanceHint: "Alege modul luminoz sau întunecat",
+    appearanceHint: "Alege modul luminos sau întunecat",
     additionalInfo: "Informații suplimentare vehicul",
     additionalInfoHint: "Număr, ID, statistici secundare",
     primaryDetail: "Detaliu principal",

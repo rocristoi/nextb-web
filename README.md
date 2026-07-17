@@ -2,7 +2,7 @@
 
 NexTB is a Next.js PWA for real-time Bucharest transit (STB trams, buses, and trolleybuses). It shows when vehicles are arriving at a stop, which vehicle it is (inventory ID, plate, illustration), how crowded it is, and whether the AC is likely working.
 
-The **frontend** (this repo) is a client-only PWA, typically deployed to a static/edge host. The **API** lives in [`backend/`](backend/) — a standalone Fastify service you run on your own infrastructure. Set `NEXT_PUBLIC_API_URL` to point the app at your API base URL.
+The **frontend** is a Next.js App Router PWA (no App Router API routes). The **API** lives in [`backend/`](backend/) — a standalone Fastify service you run on your own infrastructure. Set `NEXT_PUBLIC_API_URL` to point the app at your API base URL. UI copy is Romanian-only.
 
 ---
 
@@ -49,7 +49,7 @@ For each line at the stop, we filter `busData` to vehicles where `routeId` and `
 
 #### Step 2: Load GTFS context
 
-GTFS is downloaded from [gtfs.tpbi.ro/regional](https://gtfs.tpbi.ro/regional/BUCHAREST-REGION.zip) on first run (and refreshed daily via cron). Files land in `data/`:
+GTFS is downloaded from [gtfs.tpbi.ro/regional](https://gtfs.tpbi.ro/regional/BUCHAREST-REGION.zip) when the API starts (via `ensureGtfsData`) if the local bundle is missing or stale. Refresh on a schedule with `GET /api/cron/gtfs-refresh` (Bearer `CRON_SECRET`). Files land in `data/`:
 
 | File | Used for |
 |------|----------|
@@ -57,7 +57,7 @@ GTFS is downloaded from [gtfs.tpbi.ro/regional](https://gtfs.tpbi.ro/regional/BU
 | `routes.txt` | Line mode: tram (`route_type` 0), trolleybus (11), bus (everything else) |
 | `shapes.txt` | Route polylines. **Shape ID = route ID + direction**, e.g. line 84 direction 0 → `840`, direction 1 → `841` |
 
-Parsed stops are written to `assets/data/stops.json` during `npm run gtfs:prepare`.
+Parsed stops are written to `assets/data/stops.json` during that GTFS download.
 
 #### Step 3: Calculate position along the route
 
@@ -93,11 +93,11 @@ Vehicles behind the leader do not get their own mo-bi ETA. We use: **lead ETA + 
 
 #### Step 6: AC status and comfort score
 
-**AC confidence** comes from community reports (Neon Postgres when `DATABASE_URL` is set; in-memory locally), seeded from `data/noAC.json`:
+**AC confidence** comes from community reports (Neon Postgres when `DATABASE_URL` is set; in-memory locally), seeded from `data/noAC.json`. Thresholds use **net** votes (`broken − working`):
 
-- ≥5 "broken" votes → `broken`
-- ≥1 vote → `uncertain`
-- Otherwise type defaults (some tram/bus families never had AC)
+- net ≥ 5 → `broken`
+- net ≥ 1 → `uncertain`
+- Otherwise `ok`, or type defaults (`none` for families that never had AC)
 
 **Comfort score** (`lib/comfort/score.ts`):
 
@@ -105,7 +105,7 @@ Vehicles behind the leader do not get their own mo-bi ETA. We use: **lead ETA + 
 comfort = AC points × 0.6 + crowd points × 0.4
 ```
 
-Crowd uses `on_board` from dataset: under 25 passengers → great, under 45 → ok, else poor. Tiers: **great** (≥0.75), **ok** (≥0.45), **poor** below that.
+Crowd uses `on_board` from dataset: under 25 → 1.0 points, under 45 → 0.6, else 0.2. Combined score tiers: **great** (≥0.75), **ok** (≥0.45), **poor** below that.
 
 #### What goes back to the client
 
@@ -229,8 +229,8 @@ npm run build
 npm start
 ```
 
-**Frontend:** deploy to your static/edge host (see [`DEPLOYMENT.md`](DEPLOYMENT.md)).  
-**API:** deploy [`backend/`](backend/) separately (Docker recommended).
+**Frontend:** deploy to your Node/edge host (see [`DEPLOYMENT.md`](DEPLOYMENT.md)).  
+**API:** deploy [`backend/`](backend/) separately (systemd via `backend/scripts/setup-server.sh` is the documented path).
 
 ### Environment variables
 
@@ -247,7 +247,7 @@ Backend secrets (`DATABASE_URL`, `CRON_SECRET`, mo-bi URLs, etc.) belong in `bac
 ```bash
 npm run test:unit     # Vitest
 npm run test:e2e      # Playwright smoke test
-npm run test:ci       # full CI pipeline locally
+npm run test:ci       # full CI pipeline locally (unit + build + e2e; run lint separately)
 ```
 
 Manual checklist: [`TESTING.md`](TESTING.md). Migrations: [`tests/db/migrations/`](tests/db/migrations/).
@@ -278,7 +278,7 @@ Contributions are welcome: code, fleet data, GTFS cleanup, and regional operator
 | P1 | AC data | Verify or extend `noAC.json` / AC vote thresholds | `data/noAC.json`, `lib/server/ac-votes.ts` |
 | P2 | Quality | Tune ETA sanity defaults with real-world examples | `lib/server/data-quality.ts`, env vars |
 | P2 | Tests | Unit tests for edge cases you hit in production | `tests/unit/**/*.test.ts` |
-| P3 | Features | Vehicle detail page (mileage, VIN, photos from public sources) | new route under `app/app/` |
+| P3 | Features | Enrich vehicle detail (`/app/lookup/[inventoryId]`) with more public sources | `app/app/lookup/`, `lib/vehicles/fleet/` |
 
 ### Good first issues
 
@@ -301,9 +301,10 @@ Keep PRs focused. One fleet file, one operator, or one logic fix per PR is easie
 ## Project layout
 
 ```
-├── app/             # Pages + API routes
+├── app/             # Next.js App Router pages (PWA)
+├── backend/         # Fastify API service
 ├── components/      # UI
-├── lib/server/      # Arrivals, mo-bi, GTFS, data quality
+├── lib/server/      # Arrivals, mo-bi, GTFS, data quality (used by backend)
 ├── lib/vehicles/    # Fleet data + image map
 ├── tests/           # Unit tests, e2e smoke test, DB migrations
 ├── data/            # GTFS txt, noAC, bad-stops

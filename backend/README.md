@@ -61,11 +61,10 @@ All routes are prefixed with `/api`:
 # From repository root
 cp backend/.env.example backend/.env   # edit secrets
 npm ci
-npm run gtfs:prepare --workspace=backend
 npm run start:api
 ```
 
-Expose port `8080` behind your reverse proxy (nginx, Caddy, Traefik, etc.) and terminate TLS there. Set `CORS_ORIGIN` to your frontend URL(s).
+GTFS is fetched on startup when needed. Expose port `8080` behind your reverse proxy (nginx, Caddy, Traefik, etc.) and terminate TLS there. Set `CORS_ORIGIN` to your frontend URL(s).
 
 ### systemd (recommended)
 
@@ -98,8 +97,8 @@ Ensure `CORS_ORIGIN` in `backend/.env` includes the frontend origin.
 
 ## GTFS refresh
 
-- **Deploy:** run `npm run gtfs:prepare --workspace=backend` once (or on each deploy)
-- **Runtime:** `GET /api/cron/gtfs-refresh` with `Authorization: Bearer $CRON_SECRET` — schedule via cron
+- **Startup:** `ensureGtfsData()` downloads and extracts the TPBI zip into `data/` (and writes `assets/data/stops.json`) when the bundle is missing or checksums are stale
+- **Scheduled:** `GET /api/cron/gtfs-refresh` with `Authorization: Bearer $CRON_SECRET` — call from system cron or another scheduler
 
 ## Environment
 

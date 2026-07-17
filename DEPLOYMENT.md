@@ -1,109 +1,91 @@
-# NexTB Deployment (Vercel)
+# NexTB Deployment
 
-Deploy NexTB from the repository root. The app is a Next.js 16 PWA with a daily GTFS refresh cron and Neon Postgres for AC votes.
+NexTB is split into two deployable parts:
+
+| Component | Location | Typical host |
+|-----------|----------|--------------|
+| **Frontend** (PWA) | Repository root | Vercel, Netlify, or any static/Node host |
+| **API** | [`backend/`](backend/) | VPS or dedicated server (Node.js) |
 
 ## Prerequisites
 
 - Node.js 22 (matches CI)
-- [Vercel CLI](https://vercel.com/docs/cli): `npm i -g vercel`
-- A Neon Postgres database with the AC votes schema applied
-- Outbound network access at build time (GTFS download from `gtfs.tpbi.ro`)
+- A Postgres database for AC votes (e.g. Neon)
+- Outbound network on the API host (mo-bi, GTFS, STB alerts)
 
-## 1. Database migration
-
-Apply the migration once against your Neon database:
+Apply the AC votes migration once:
 
 ```bash
-# Using psql (replace with your connection string locally — never commit it)
 psql "$DATABASE_URL" -f tests/db/migrations/001_ac_votes.sql
 ```
 
-This creates the `ac_votes` table and index used by `/api/ac/report` and `/api/ac/status`.
+---
 
-## 2. Environment variables
+## 1. Deploy the API
 
-Copy the template and fill in secrets locally:
+See [`backend/README.md`](backend/README.md) for environment variables and GTFS refresh.
+
+Minimum steps:
 
 ```bash
-cp .env.example .env.local
+cp backend/.env.example backend/.env   # configure secrets
+npm ci
+npm run gtfs:prepare --workspace=backend
+npm run start:api
+curl http://127.0.0.1:8080/health
 ```
 
-Set these in **Vercel → Project → Settings → Environment Variables** for Production, Preview, and Development:
+For a persistent service, use systemd — see `backend/deploy/systemd/nextb-api.service`.
+
+Expose the service via your reverse proxy with HTTPS, e.g. `https://api.example.com`.
+
+---
+
+## 2. Deploy the frontend
+
+### Environment variables
+
+Set in your frontend host (e.g. Vercel → Project → Settings → Environment Variables):
 
 | Variable | Required | Notes |
 |----------|----------|-------|
-| `DATABASE_URL` | Yes | Neon Postgres connection string |
-| `CRON_SECRET` | Yes | Random secret; Vercel Cron sends `Authorization: Bearer <CRON_SECRET>` |
-| `DEVICE_HASH_SALT` | Yes | Random secret for AC report device hashing |
-| `CORS_MOBI_*` | No | Defaults point to mo-bi.ro |
-| `MIN_MINUTES_PER_STOP` | No | Default `2` |
-| `AVG_SPEED_METERS_PER_MIN` | No | Default `230` |
-| `ETA_TOLERANCE_MINUTES` | No | Default `1` |
-| `STOP_SPACING_METERS` | No | Default `350` |
+| `NEXT_PUBLIC_API_URL` | Yes | API base URL, e.g. `https://api.example.com` (no trailing slash) |
 
-Never echo secret values in logs or chat.
-
-Sync from Vercel to local after linking:
+Local development:
 
 ```bash
-vercel env pull .env.local
+cp .env.example .env.local
+# NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
-Or push required secrets from `.env.local` to all Vercel environments:
-
-```bash
-node scripts/sync-vercel-env.mjs
-```
-
-## 3. Link and deploy
-
-From the repository root:
+### Vercel (example)
 
 ```bash
 vercel link
-vercel          # preview deployment
-vercel --prod   # production (confirm when prompted)
+vercel          # preview
+vercel --prod   # production
 ```
-
-### Vercel project settings
 
 | Setting | Value |
 |---------|-------|
 | Framework | Next.js |
-| Root Directory | `.` (repository root) |
-| Build Command | `npm run build` (includes GTFS prebuild) |
-| Install Command | `npm ci` |
+| Build Command | `npm run build` |
 | Node.js version | 22 |
 
-`vercel.json` configures the daily cron:
-
-- **Path:** `/api/cron/gtfs-refresh`
-- **Schedule:** `0 3 * * *` (03:00 UTC)
-
-The cron route accepts auth via `Authorization: Bearer <CRON_SECRET>` (Vercel default) or `?secret=<CRON_SECRET>` for manual testing.
-
-Manual cron test:
-
-```bash
-curl -H "Authorization: Bearer YOUR_CRON_SECRET" https://YOUR_DEPLOYMENT/api/cron/gtfs-refresh
-```
-
-## 4. Post-deploy verification
+### Post-deploy checks
 
 - [ ] `/` and `/app/home` load
-- [ ] `/api/routes` returns JSON
-- [ ] `/app/faulty` — submit AC report, refresh page, vote persists (Neon)
-- [ ] Preview deployment status is **Ready** in Vercel dashboard
-- [ ] Cron appears under **Settings → Cron Jobs**
+- [ ] Map stops load (API `/api/getstops`)
+- [ ] Station panel shows arrivals
+- [ ] AC report on `/app/faulty` persists after refresh
 
-## Known serverless limitations
-
-- **Rate limiting** (`lib/server/rate-limit.ts`) is per serverless instance, not global across regions.
-- **GTFS cache** on the filesystem is ephemeral; the build step and daily cron refresh data. Cold starts re-download via `instrumentation.ts` if files are missing.
-- **Cron duration** — the GTFS refresh route sets `maxDuration = 60`. On Hobby, function timeouts may be lower; upgrade to Pro if cron jobs fail with timeout errors.
+---
 
 ## CI
 
-GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint, unit tests, production build, and Playwright smoke e2e on push/PR to `main`/`master`.
+| Workflow | Purpose |
+|----------|---------|
+| [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Frontend lint, unit tests, e2e |
+| [`.github/workflows/backend-ci.yml`](.github/workflows/backend-ci.yml) | API typecheck |
 
 For local testing, see [`TESTING.md`](TESTING.md).

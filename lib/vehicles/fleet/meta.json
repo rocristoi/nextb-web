@@ -21,7 +21,7 @@
     ]
   },
   "cityTour": {
-    "source": "Bucharest City Tour — Volvo B9R UNVI Urbis",
+    "source": "Date nexTB (Iun. 2026)",
     "count": 6,
     "fields": [
       "inventory",
@@ -30,7 +30,7 @@
     ]
   },
   "trolleybus": {
-    "source": "transport-in-comun.ro/bucuresti — parc_troleibuze.csv + date NexTB (Iun. 2026)",
+    "source": "transport-in-comun.ro/bucuresti + date NexTB (Iun. 2026)",
     "count": 486,
     "fields": [
       "inventory",

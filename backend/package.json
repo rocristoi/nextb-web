@@ -1,0 +1,35 @@
+{
+  "name": "nextb-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "NexTB transit API: mo-bi, GTFS, fleet, and AC voting",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "lint": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.0.1",
+    "@fastify/helmet": "^13.0.1",
+    "@neondatabase/serverless": "^1.1.0",
+    "@turf/turf": "^7.3.5",
+    "axios": "^1.18.1",
+    "csv-parse": "^7.0.1",
+    "csv-parser": "^3.2.1",
+    "dotenv": "^16.6.1",
+    "fastify": "^5.4.0",
+    "haversine-distance": "^1.2.4",
+    "node-cache": "^5.1.2",
+    "tsx": "^4.20.3",
+    "unzipper": "^0.12.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/unzipper": "^0.10.11",
+    "typescript": "^5",
+    "vitest": "^4.1.10"
+  }
+}

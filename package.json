@@ -1,11 +1,15 @@
 {
   "name": "nextb-web",
   "version": "2.0.0",
+  "license": "MIT",
   "private": true,
+  "workspaces": [
+    "backend"
+  ],
   "scripts": {
     "dev": "next dev --webpack",
-    "gtfs:prepare": "node scripts/gtfs-prepare.mjs",
-    "prebuild": "npm run gtfs:prepare",
+    "dev:api": "npm run dev --workspace=backend",
+    "start:api": "npm run start --workspace=backend",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",

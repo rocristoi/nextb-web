@@ -12,6 +12,7 @@ import { soonestEta, countActiveLines, formatEtaLabel } from "@/lib/station/help
 import { favoriteLinesWithAlerts } from "@/lib/alerts/helpers";
 import { PageHeader, Card, EmptyState, Skeleton } from "@/components/ui";
 import { HomeDisclaimerBanner } from "@/components/home/HomeDisclaimerBanner";
+import { HomeBetaBanner } from "@/components/home/HomeBetaBanner";
 import { ro } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -79,6 +80,7 @@ export default function HomePage() {
   return (
     <div className="mx-auto min-h-dvh max-w-2xl px-5 pb-28 pt-[calc(1.25rem+env(safe-area-inset-top))] lg:max-w-xl lg:pb-10 lg:pt-10">
       <PageHeader title={ro.home.title} subtitle={ro.home.subtitle} />
+      <HomeBetaBanner />
       <HomeDisclaimerBanner />
 
       {favoriteStopIds.length === 0 && (

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useSyncExternalStore, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowSquareOut, GithubLogo } from "@phosphor-icons/react";
+import { ArrowRight, ArrowSquareOut, GithubLogo, Star } from "@phosphor-icons/react";
 import { NexTBLogo } from "@/components/brand/NexTBLogo";
 import { MarketingHeader } from "@/components/layout/MarketingHeader";
 import { transitStats } from "@/lib/stats";
@@ -133,12 +133,15 @@ function Hero() {
               Deschide aplicația
               <ArrowRight className="h-4 w-4" weight="bold" />
             </Link>
-            <Link
-              href="#data-sources"
-              className="inline-flex items-center justify-center rounded-xl border border-elevated-2 bg-card px-6 py-3 text-[15px] font-semibold text-foreground transition-colors hover:bg-elevated"
+            <a
+              href="https://github.com/rocristoi/nextb-web"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-elevated-2 bg-card px-6 py-3 text-[15px] font-semibold text-foreground transition-colors hover:bg-elevated"
             >
-              Vezi sursele de date
-            </Link>
+              <Star className="h-4 w-4" weight="fill" />
+              Star pe GitHub
+            </a>
           </div>
         </div>
         <div className="lg:justify-self-end lg:w-full lg:max-w-md">
